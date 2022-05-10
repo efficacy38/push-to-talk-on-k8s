@@ -1,5 +1,7 @@
 FROM debian:buster
 
+MAINTAINER Jerry Drung "efficacy38@gmail.com"
+
 RUN apt-get update \
   && apt-get install -y wget \
   && TMP_DIR=$(mktemp -d) \
