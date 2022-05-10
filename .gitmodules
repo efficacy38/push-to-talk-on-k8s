@@ -1,0 +1,3 @@
+[submodule "mysql/kamailio"]
+	path = mysql/kamailio
+	url = https://github.com/kamailio/kamailio.git
