@@ -34,7 +34,7 @@ sed -i -e "s/MY_IP/$MY_IP/g" /etc/rtpengine.conf
 
 if [ "$1" = 'rtpengine' ]; then
   shift
-  exec rtpengine --config-file /etc/rtpengine.conf  "$@"
+  exec rtpengine --config-file /etc/rtpengine/rtpengine.conf  "$@"
 fi
 
 exec "$@"
