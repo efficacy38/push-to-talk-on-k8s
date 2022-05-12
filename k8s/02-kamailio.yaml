@@ -1,0 +1,87 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  creationTimestamp: null
+  name: kamailio-pods
+---
+# which generate it with following cmd
+# k create role kamailio-service-viewer --verb=get --verb=watch \
+#   --resource=service --resource-name=kamailio --dry-run=client -o yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  creationTimestamp: null
+  name: kamailio-service-viewer
+  namespace: default
+rules:
+- apiGroups:
+  - ""
+  resourceNames:
+  - kamailio
+  resources:
+  - services
+  verbs:
+  - get
+  - watch
+--- 
+
+# create this role binding with following cmd
+# k create rolebinding kamailio-service-rolebinding --role=kamailio-service-viewer \
+#   --serviceaccount=default:kamailio-pods  --dry-run=client -o yaml -n default
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  creationTimestamp: null
+  name: kamailio-service-rolebinding
+  namespace: default
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: kamailio-service-viewer
+subjects:
+- kind: ServiceAccount
+  name: kamailio-pods
+  namespace: default
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kamailio
+  labels:
+    app: kamailio
+spec:
+  type: LoadBalancer
+  selector:
+    app: kamailio
+  ports:
+    - name: sip
+      protocol: UDP
+      port: 5060
+      targetPort: 5060
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kamailio-deployment
+  labels:
+    app: kamailio
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kamailio
+  template:
+    metadata:
+      labels:
+        app: kamailio
+    spec:
+      serviceAccountName: kamailio-pods
+      containers:
+      - name: kamailio
+        image: efficacy38/kamailio:v1.6
+        ports:
+        - containerPort: 5060
+      - name: ambassador
+        image: efficacy38/kubectl-proxy:v2
