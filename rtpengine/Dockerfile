@@ -1,27 +1,31 @@
 FROM debian:buster
+
 MAINTAINER Jerry Drung "efficacy38@gmail.com"
 
-RUN apt-get update && \
-    apt-get install -y curl procps gnupg2 sngrep && \
-    apt-get clean
+RUN apt-get update \
+  && apt-get install -y wget \
+  && TMP_DIR=$(mktemp -d) \
+  && wget http://ms15.voip.edu.tw/~jerry/build.tar.gz -O "$TMP_DIR/build.tar.gz" \
+  && tar -zxvf "$TMP_DIR/build.tar.gz" -C $TMP_DIR \
+  && dpkg -i $TMP_DIR/build/bcg729/libbcg729-*.deb \
+  && dpkg -i --force-depends $TMP_DIR/build/rtpengine/ngcp-rtpengine-daemon_*.deb \
+  && apt --fix-broken install -y \
+  && rm -rf $TMP_DIR \
+  && rm -rf /var/lib/apt/* \
+  && rm -rf /var/lib/dpkg/* \
+  && rm -rf /var/lib/cache/* \
+  && rm -Rf /var/log/* \
+  && rm -Rf /usr/local/src/* \
+  && rm -Rf /var/lib/apt/lists/* 
 
-# Install kamailio
-RUN curl -qO http://deb.kamailio.org/kamailiodebkey.gpg && \
-    apt-key add kamailiodebkey.gpg && \
-    echo "deb http://deb.kamailio.org/kamailio55 buster main\ndeb-src http://deb.kamailio.org/kamailio55 buster main" > /etc/apt/sources.list.d/kamailio.list
-RUN apt-get update &&  apt-get install -y kamailio kamailio-json-modules kamailio-utils-modules kamailio-extra-modules kamailio-nth && apt-get clean
+VOLUME ["/tmp"]
 
-# Download netdiscover
-RUN curl -qL -o /usr/bin/netdiscover https://github.com/CyCoreSystems/netdiscover/releases/download/v1.2.5/netdiscover.linux.amd64
-RUN chmod +x /usr/bin/netdiscover
+EXPOSE 23000-32768/udp 22222/udp
 
-# Install config and templates
-ADD config /etc/kamailio
-# ADD dispatcher.list /data/kamailio/dispatcher.list
+COPY ./entrypoint.sh /entrypoint.sh
 
-ADD entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+COPY ./rtpengine.conf /etc/rtpengine
+
 ENTRYPOINT ["/entrypoint.sh"]
-# ENTRYPOINT ["kamailio", "-DD", "-E", "-f", "/etc/kamailio/kamailio.cfg"]
 
-CMD []
+CMD ["rtpengine"]

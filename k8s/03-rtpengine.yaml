@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: rtpengine-daemon
+spec:
+  selector:
+    matchLabels:
+      app: rtpengine
+  template:
+    metadata:
+      labels:
+        app: rtpengine
+    spec:
+      nodeSelector:
+        fast-network: "true"
+      hostNetwork: true
+      containers:
+        - name: rtpengine
+          image: efficacy38/rtpengine:v2.3
+          # image: ubuntu
+          # command: ["sleep", "infinity"]
+          env:
+          - name: PUBLIC_IP
+            valueFrom:
+              fieldRef:
+                fieldPath: status.hostIP
+          - name: LOCAL_IP
+            valueFrom:
+              fieldRef:
+                fieldPath: status.hostIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-service
+spec:
+  clusterIP: None
+  selector:
+    app: rtpengine

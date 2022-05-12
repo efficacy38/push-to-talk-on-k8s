@@ -25,16 +25,28 @@ fi
 : ${PUBLIC_HOSTNAME="$(netdiscover -field hostname ${PROVIDER})"}
 
 # Build local configuration
-cat <<ENDHERE >/data/kamailio/local.k
-#!substdef "/PUBLIC_IP/${PUBLIC_IPV4}/"
-#!substdef "/PRIVATE_IP/${PRIVATE_IPV4}/"
-# alias=${PUBLIC_IPV4} ${PUBLIC_HOSTNAME} ${SIP_HOSTNAME}
+# cat <<ENDHERE >/data/kamailio/local.k
+# #!substdef "/PUBLIC_IP/${PUBLIC_IPV4}/"
+# #!substdef "/PRIVATE_IP/${PRIVATE_IPV4}/"
+# # alias=${PUBLIC_IPV4} ${PUBLIC_HOSTNAME} ${SIP_HOSTNAME}
+# # listen=udp:${PRIVATE_IPV4}:5060 advertise ${PUBLIC_IPV4}:5060
+# # listen=udp:${PRIVATE_IPV4}:5080
+# 
+# # following is the test environment, which accept private ip
+# alias=${PUBLIC_IPV4} ${PUBLIC_HOSTNAME} ${SIP_HOSTNAME} ${PRIVATE_IP}
 # listen=udp:${PRIVATE_IPV4}:5060 advertise ${PUBLIC_IPV4}:5060
 # listen=udp:${PRIVATE_IPV4}:5080
+# ENDHERE
 
-# following is the test environment, which accept private ip
-alias=${PUBLIC_IPV4} ${PUBLIC_HOSTNAME} ${SIP_HOSTNAME} ${PRIVATE_IP}
-listen=udp:${PRIVATE_IPV4}:5060 advertise ${PUBLIC_IPV4}:5060
+TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
+NS=$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace)
+CA_CRT="/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+loadBalancerIP=$(curl -H "Authorization: Bearer $TOKEN" --cacert $CA_CRT https://kubernetes/api/v1/namespaces/$NS/services/kamailio | jq -r .status.loadBalancer.ingress[0].ip)
+
+cat <<ENDHERE >/data/kamailio/local.k
+#!substdef "/k8s_loadbalencer_domain/${loadBalancerIP}/"
+alias=k8s_loadbalencer_domain
+listen=udp:${PRIVATE_IPV4}:5060 advertise k8s_loadbalencer_domain:5060
 listen=udp:${PRIVATE_IPV4}:5080
 ENDHERE
 

@@ -29,11 +29,35 @@ spec:
               secretKeyRef:
                 name: helloworld-secrets
                 key: password
-          - name: MYSQL_DATABASE
-            valueFrom:
-              secretKeyRef:
-                name: helloworld-secrets
-                key: database
   selector:
     matchLabels:
       app: mysql
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: helloworld-secrets
+type: Opaque
+data:
+  # username: helloworld
+  # password: password
+  # rootPassword: rootpassword
+  # database: helloworld
+  username: aGVsbG93b3JsZA==
+  password: cGFzc3dvcmQ=
+  rootPassword: cm9vdHBhc3N3b3Jk
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-db-service
+spec:
+  ports: db-conn
+  - port: 3306
+    targetPort: 3306
+    protocol: TCP
+  selector:
+    app: mysql
+  type: LoadBalencer
