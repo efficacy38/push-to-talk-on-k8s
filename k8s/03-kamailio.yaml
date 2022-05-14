@@ -68,7 +68,7 @@ metadata:
   labels:
     app: kamailio
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: kamailio
@@ -78,10 +78,36 @@ spec:
         app: kamailio
     spec:
       serviceAccountName: kamailio-pods
+      volumes:
+        - name: rtpengine-config
+          emptyDir: {}
+        - name: kamailio-config
+          configMap:
+            name: kamailio-config
+      initContainers:
+        - name: init-rtpengine-config
+          image: tutum/dnsutils
+          command: ["/bin/sh"]
+          args:
+            - '-c'
+            - >-
+               host -t A rtpengine-service |
+               cut -d ' ' -f 4 |
+               xargs printf 'modparam("rtpengine", "rtpengine_sock", "udp:%s:2223")\n' |
+               tee /data/rtpengine/rtpengine.k
+          volumeMounts:
+            - name: rtpengine-config
+              mountPath: /data/rtpengine
       containers:
       - name: kamailio
         image: efficacy38/kamailio:v1.6
         ports:
         - containerPort: 5060
+        volumeMounts:
+          - name: rtpengine-config
+            mountPath: /data/rtpengine
+          - name: kamailio-config
+            mountPath: /etc/kamailio
+
       - name: ambassador
         image: efficacy38/kubectl-proxy:v2
