@@ -95,9 +95,9 @@ spec:
                cut -d ' ' -f 4 |
                xargs printf 'modparam("rtpengine", "rtpengine_sock", "udp:%s:2223")\n' |
                tee /data/rtpengine/rtpengine.k;
-               hostname |
-               xargs printf 'sl_send_reply(487, "%s");\n' |
-               tee /data/rtpengine/hostname.k
+               # hostname |
+               # xargs printf 'sl_send_reply(487, "%s");\n' |
+               # tee /data/rtpengine/hostname.k
           volumeMounts:
             - name: rtpengine-config
               mountPath: /data/rtpengine
