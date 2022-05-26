@@ -1,0 +1,65 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  creationTimestamp: null
+  name: kamailio-config-sync-pod
+---
+# which generate it with following cmd
+# k create role kamailio-service-viewer --verb=get --verb=watch \
+#   --resource=service --resource-name=kamailio --dry-run=client -o yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  creationTimestamp: null
+  name: rtpengine-service-watcher
+  namespace: default
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  verbs:
+  - get
+  - watch
+--- 
+
+# create this role binding with following cmd
+# k create rolebinding kamailio-service-rolebinding --role=kamailio-service-viewer \
+#   --serviceaccount=default:kamailio-pods  --dry-run=client -o yaml -n default
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  creationTimestamp: null
+  name: rtpengine-service-rolebinding
+  namespace: default
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: rtpengine-service-watcher
+subjects:
+- kind: ServiceAccount
+  name: kamailio-config-sync-pod
+  namespace: default
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kamailio-config-sync
+  labels:
+    app: kamailio-config-cync
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: kamailio-config-sync
+  template:
+    metadata:
+      labels:
+        app: kamailio-config-sync
+    spec:
+      serviceAccountName: kamailio-config-sync-pod
+      containers:
+      - name: kamailio-sync
+        image: efficacy38/watcher:v1

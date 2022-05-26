@@ -1,4 +1,4 @@
-#!/bin/env python3.9
+#!/bin/python3
 import threading
 import uuid
 from kubernetes import client, config, watch
@@ -18,7 +18,8 @@ import os
 logging.basicConfig(level=logging.INFO)
 
 # Authenticate using config file
-config.load_kube_config(config_file=r"~/.kube/config")
+# config.load_kube_config(config_file=r"~/.kube/config")
+config.load_incluster_config()
 
 # database setting
 db_setting = {

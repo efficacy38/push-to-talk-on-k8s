@@ -1,4 +1,4 @@
-#!/bin/env python3.9
+#!/bin/python3
 import pymysql
 
 class Controller:
