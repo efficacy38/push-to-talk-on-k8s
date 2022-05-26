@@ -33,7 +33,7 @@ fi
 # # listen=udp:${PRIVATE_IPV4}:5080
 # 
 # # following is the test environment, which accept private ip
-# alias=${PUBLIC_IPV4} ${PUBLIC_HOSTNAME} ${SIP_HOSTNAME} ${PRIVATE_IP}
+# alias=${PUBLIC_IPV3} ${PUBLIC_HOSTNAME} ${SIP_HOSTNAME} ${PRIVATE_IP}
 # listen=udp:${PRIVATE_IPV4}:5060 advertise ${PUBLIC_IPV4}:5060
 # listen=udp:${PRIVATE_IPV4}:5080
 # ENDHERE

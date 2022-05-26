@@ -68,7 +68,7 @@ metadata:
   labels:
     app: kamailio
 spec:
-  replicas: 10
+  replicas: 2
   selector:
     matchLabels:
       app: kamailio
@@ -91,19 +91,14 @@ spec:
           args:
             - '-c'
             - >-
-               host -t A rtpengine-service |
-               cut -d ' ' -f 4 |
-               xargs printf 'modparam("rtpengine", "rtpengine_sock", "udp:%s:2223")\n' |
-               tee /data/rtpengine/rtpengine.k;
-               # hostname |
-               # xargs printf 'sl_send_reply(487, "%s");\n' |
-               # tee /data/rtpengine/hostname.k
+               printf '#!trydef DBURL "mysql://kamailio:kamailiorw@mysqldb/kamailio"\n' > /data/rtpengine/db_url.k;
           volumeMounts:
             - name: rtpengine-config
               mountPath: /data/rtpengine
       containers:
       - name: kamailio
-        image: efficacy38/kamailio:v1.6
+        image: efficacy38/kamailio:v1.9
+        # command: ["sleep", "infinity"]
         ports:
         - containerPort: 5060
         volumeMounts:
