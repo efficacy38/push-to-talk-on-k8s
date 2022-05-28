@@ -107,5 +107,5 @@ spec:
           - name: kamailio-config
             mountPath: /etc/kamailio
 
-      - name: ambassador
-        image: efficacy38/kubectl-proxy:v2
+            # - name: ambassador
+            #   image: efficacy38/kubectl-proxy:v2
