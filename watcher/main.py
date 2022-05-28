@@ -39,8 +39,8 @@ leaderElectionConfig = {
 # public variables
 isMaster = False
 flush_cache_timer = None
-db_operation = []                          # cache of db_operation
-lock = threading.Lock()                    # mutex lock for db_operation
+db_operation = []                                       # cache of db_operation
+lock = threading.Lock()                                 # mutex lock for db_operation
 db_controller = Controller(**db_setting)
 
 

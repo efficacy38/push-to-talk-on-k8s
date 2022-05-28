@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   creationTimestamp: null
-  name: kamailio-config-sync-pod
+  name: kamailio-config-sync-sa
 ---
 # which generate it with following cmd
 # k create role kamailio-service-viewer --verb=get --verb=watch \
@@ -20,7 +20,21 @@ rules:
   - pods
   verbs:
   - get
+  - list
   - watch
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+    # resourceNames:
+    # - rtpengine-controller
+  verbs:
+  - create
+  - get
+  - watch
+  - list
+  - update
+  - patch
 --- 
 
 # create this role binding with following cmd
@@ -38,7 +52,7 @@ roleRef:
   name: rtpengine-service-watcher
 subjects:
 - kind: ServiceAccount
-  name: kamailio-config-sync-pod
+  name: kamailio-config-sync-sa
   namespace: default
 
 ---
@@ -50,7 +64,7 @@ metadata:
   labels:
     app: kamailio-config-cync
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: kamailio-config-sync
@@ -59,7 +73,34 @@ spec:
       labels:
         app: kamailio-config-sync
     spec:
-      serviceAccountName: kamailio-config-sync-pod
+      serviceAccountName: kamailio-config-sync-sa
       containers:
       - name: kamailio-sync
-        image: efficacy38/watcher:v1
+        image: efficacy38/watcher:v1.1
+        env:
+          - name: DB_HOST
+            valueFrom:
+              configMapKeyRef:
+                name: watcher-config
+                key: db-host
+          - name: KAMAILIO_RW_USER
+            valueFrom:
+              configMapKeyRef:
+                name: watcher-config
+                key: kamailio-rw-user
+          - name: KAMAILIO_RW_PW
+            valueFrom:
+              configMapKeyRef:
+                name: watcher-config
+                key: kamailio-rw-pw
+          - name: KAMAILIO_DB
+            valueFrom:
+              configMapKeyRef:
+                name: watcher-config
+                key: kamailio-db
+          - name: namespace
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+      - name: ambassador
+        image: efficacy38/kubectl-proxy:v2
