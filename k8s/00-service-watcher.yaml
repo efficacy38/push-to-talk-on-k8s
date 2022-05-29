@@ -64,7 +64,7 @@ metadata:
   labels:
     app: kamailio-config-cync
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       app: kamailio-config-sync
@@ -76,7 +76,8 @@ spec:
       serviceAccountName: kamailio-config-sync-sa
       containers:
       - name: kamailio-sync
-        image: efficacy38/watcher:v1.1
+        image: efficacy38/watcher:v1.2
+        imagePullPolicy: Always
         env:
           - name: DB_HOST
             valueFrom:

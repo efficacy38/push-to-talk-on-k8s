@@ -6,6 +6,7 @@ from kubernetes.leaderelection import leaderelection
 from kubernetes.leaderelection.resourcelock.configmaplock import ConfigMapLock
 from kubernetes.leaderelection import electionconfig
 from database_controller import Controller
+from reload_kamailio import reload_rtpengine
 import logging
 import os
 
@@ -31,8 +32,10 @@ db_setting = {
 
 # leader election setting
 leaderElectionConfig = {
-    "candidate_id": uuid.uuid4(),                       # A unique identifier for this candidate
-    "lock_name": "rtpengine-controller",                # Name of the lock object to be created
+    # A unique identifier for this candidate
+    "candidate_id": uuid.uuid4(),
+    # Name of the lock object to be created
+    "lock_name": "rtpengine-controller",
     "lock_namespace": os.environ["namespace"]           # Kubernetes namespace
 }
 
@@ -40,7 +43,8 @@ leaderElectionConfig = {
 isMaster = False
 flush_cache_timer = None
 db_operation = []                                       # cache of db_operation
-lock = threading.Lock()                                 # mutex lock for db_operation
+# mutex lock for db_operation
+lock = threading.Lock()
 db_controller = Controller(**db_setting)
 
 
@@ -83,6 +87,7 @@ def dbJob():
         else:
             db_controller.add_new_rtpengine(event["ip"])
 
+    reload_rtpengine()
     db_operation = []
     lock.release()
 

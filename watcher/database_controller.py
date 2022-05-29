@@ -33,7 +33,7 @@ class Controller:
         sql = """
         DELETE FROM rtpengine
         WHERE url='{url}';
-        """.format(url="udp:{}:22223".format(url))
+        """.format(url="udp:{}:2223".format(url))
         cursor = self.db.cursor()
 
         try:
