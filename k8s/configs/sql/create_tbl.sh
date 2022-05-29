@@ -4,7 +4,7 @@ set -x
 
 source .env
 
-create_db=(standard-create.sql auth_db-create.sql rtpengine-create.sql usrloc-create.sql)
+create_db=(standard-create.sql auth_db-create.sql rtpengine-create.sql usrloc-create.sql permissions-create.sql)
 
 # create db
 mysql -u root -p"$DBROOTPW" -h $DBHOST <<EOF
