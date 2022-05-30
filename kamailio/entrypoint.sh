@@ -45,6 +45,8 @@ loadBalancerIP=$(curl -H "Authorization: Bearer $TOKEN" --cacert $CA_CRT https:/
 
 cat <<ENDHERE >/data/kamailio/local.k
 #!substdef "/k8s_loadbalencer_domain/${loadBalancerIP}/"
+#!define LB_IP "${loadBalancerIP}"
+#!define LOCAL_IP "${PRIVATE_IPV4}"
 alias=k8s_loadbalencer_domain
 listen=udp:${PRIVATE_IPV4}:5060 advertise k8s_loadbalencer_domain:5060
 listen=udp:${PRIVATE_IPV4}:5080
