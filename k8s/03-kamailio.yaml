@@ -85,7 +85,7 @@ metadata:
   labels:
     app: kamailio
 spec:
-  replicas: 1
+  replicas: 4
   selector:
     matchLabels:
       app: kamailio
@@ -114,7 +114,9 @@ spec:
               mountPath: /data/rtpengine
       containers:
       - name: kamailio
-        image: efficacy38/kamailio:v1.9
+        # image: efficacy38/kamailio:v1.13
+        image: efficacy38/kamailio:v1.13-test
+        imagePullPolicy: Always
         # command: ["sleep", "infinity"]
         ports:
         - containerPort: 5060
