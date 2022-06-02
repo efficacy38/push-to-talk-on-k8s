@@ -115,8 +115,8 @@ spec:
       containers:
       - name: kamailio
         # image: efficacy38/kamailio:v1.13
-        image: efficacy38/kamailio:v1.14
-        # imagePullPolicy: Always
+        image: efficacy38/kamailio:v1.15
+        imagePullPolicy: Always
         # command: ["sleep", "infinity"]
         ports:
         - containerPort: 5060

@@ -24,20 +24,6 @@ fi
 : ${PUBLIC_IPV4="$(netdiscover -field publicv4 ${PROVIDER})"}
 : ${PUBLIC_HOSTNAME="$(netdiscover -field hostname ${PROVIDER})"}
 
-# Build local configuration
-# cat <<ENDHERE >/data/kamailio/local.k
-# #!substdef "/PUBLIC_IP/${PUBLIC_IPV4}/"
-# #!substdef "/PRIVATE_IP/${PRIVATE_IPV4}/"
-# # alias=${PUBLIC_IPV4} ${PUBLIC_HOSTNAME} ${SIP_HOSTNAME}
-# # listen=udp:${PRIVATE_IPV4}:5060 advertise ${PUBLIC_IPV4}:5060
-# # listen=udp:${PRIVATE_IPV4}:5080
-# 
-# # following is the test environment, which accept private ip
-# alias=${PUBLIC_IPV3} ${PUBLIC_HOSTNAME} ${SIP_HOSTNAME} ${PRIVATE_IP}
-# listen=udp:${PRIVATE_IPV4}:5060 advertise ${PUBLIC_IPV4}:5060
-# listen=udp:${PRIVATE_IPV4}:5080
-# ENDHERE
-
 TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
 NS=$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace)
 CA_CRT="/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
@@ -47,6 +33,8 @@ cat <<ENDHERE >/data/kamailio/local.k
 #!substdef "/k8s_loadbalencer_domain/${loadBalancerIP}/"
 #!define LB_IP "${loadBalancerIP}"
 #!define LOCAL_IP "${PRIVATE_IPV4}"
+#!subst "/SUB_LB_IP/${loadBalancerIP}/g"
+#!subst "/SUB_LOCAL_IP/${PRIVATE_IPV4}/g"
 alias=k8s_loadbalencer_domain
 listen=udp:${PRIVATE_IPV4}:5060 advertise k8s_loadbalencer_domain:5060
 listen=udp:${PRIVATE_IPV4}:5080
