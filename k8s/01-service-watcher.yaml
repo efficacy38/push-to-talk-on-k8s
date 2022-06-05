@@ -76,29 +76,29 @@ spec:
       serviceAccountName: kamailio-config-sync-sa
       containers:
       - name: kamailio-sync
-        image: efficacy38/watcher:v1.2
-        imagePullPolicy: Always
+        image: efficacy38/watcher:v1.3
+        # imagePullPolicy: Always
         env:
           - name: DB_HOST
             valueFrom:
               configMapKeyRef:
-                name: watcher-config
-                key: db-host
-          - name: KAMAILIO_RW_USER
-            valueFrom:
-              configMapKeyRef:
-                name: watcher-config
-                key: kamailio-rw-user
-          - name: KAMAILIO_RW_PW
-            valueFrom:
-              configMapKeyRef:
-                name: watcher-config
-                key: kamailio-rw-pw
+                name: kamailio-db-config
+                key: DB_SVC_NAME
           - name: KAMAILIO_DB
             valueFrom:
               configMapKeyRef:
-                name: watcher-config
-                key: kamailio-db
+                name: kamailio-db-config
+                key: DATABASE
+          - name: KAMAILIO_RW_USER
+            valueFrom:
+              secretKeyRef:
+                name: kamailio-db-secret
+                key: RW_USER
+          - name: KAMAILIO_RW_PW
+            valueFrom:
+              secretKeyRef:
+                name: kamailio-db-secret
+                key: RW_PASSWD
           - name: namespace
             valueFrom:
               fieldRef:

@@ -9,6 +9,7 @@ from database_controller import Controller
 from reload_kamailio import reload_rtpengine
 import logging
 import os
+import socket
 
 # self-build informer this is not stable
 # FIXME: rewrite it at go lang or js which has informer
@@ -33,7 +34,7 @@ db_setting = {
 # leader election setting
 leaderElectionConfig = {
     # A unique identifier for this candidate
-    "candidate_id": uuid.uuid4(),
+    "candidate_id": socket.gethostname(),
     # Name of the lock object to be created
     "lock_name": "rtpengine-controller",
     "lock_namespace": os.environ["namespace"]           # Kubernetes namespace
