@@ -85,7 +85,7 @@ metadata:
   labels:
     app: kamailio
 spec:
-  replicas: 4
+  replicas: 1
   selector:
     matchLabels:
       app: kamailio
@@ -104,11 +104,48 @@ spec:
       initContainers:
         - name: init-rtpengine-config
           image: tutum/dnsutils
+          env:
+            - name: DB_SVC_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: kamailio-db-config
+                  key: DB_SVC_NAME
+            - name: DATABASE
+              valueFrom:
+                configMapKeyRef:
+                  name: kamailio-db-config
+                  key: DATABASE
+            - name: RW_USER
+              valueFrom:
+                secretKeyRef:
+                  name: kamailio-db-secret
+                  key: RW_USER
+            - name: RW_PASSWD
+              valueFrom:
+                secretKeyRef:
+                  name: kamailio-db-secret
+                  key: RW_PASSWD
+            - name: RO_USER
+              valueFrom:
+                secretKeyRef:
+                  name: kamailio-db-secret
+                  key: RO_USER
+            - name: RO_PASSWD
+              valueFrom:
+                secretKeyRef:
+                  name: kamailio-db-secret
+                  key: RO_USER
+            - name: DBURL
+              value: "mysql://$(RW_USER):$(RW_PASSWD)@$(DB_SVC_NAME)/$(DATABASE)"
+            - name: DBROURL
+              value: "mysql://$(RO_USER):$(RO_PASSWD)@$(DB_SVC_NAME)-ro/$(DATABASE)"
           command: ["/bin/sh"]
           args:
             - '-c'
             - >-
-               printf '#!trydef DBURL "mysql://kamailio:kamailiorw@mysqldb/kamailio"\n' > /data/rtpengine/db_url.k;
+               printf '#!trydef DBURL "%s"\n' $DBURL >> /data/rtpengine/db_url.k;
+               printf '#!trydef RODBURL "%s"\n' $DBROURL >> /data/rtpengine/db_url.k;
+               printf '#!trydef CONTACT_DB "contacts_db=>%s"\n' $DBROURL >> /data/rtpengine/db_url;
           volumeMounts:
             - name: rtpengine-config
               mountPath: /data/rtpengine
@@ -125,6 +162,3 @@ spec:
             mountPath: /data/rtpengine
           - name: kamailio-config
             mountPath: /etc/kamailio
-
-            # - name: ambassador
-            #   image: efficacy38/kubectl-proxy:v2

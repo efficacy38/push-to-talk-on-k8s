@@ -1,0 +1,2 @@
+DB_SVC_NAME=mysqldb
+DATABASE=kamailio
