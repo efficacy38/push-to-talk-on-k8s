@@ -138,7 +138,7 @@ spec:
             - name: DBURL
               value: "mysql://$(RW_USER):$(RW_PASSWD)@$(DB_SVC_NAME)/$(DATABASE)"
             - name: DBROURL
-              value: "mysql://$(RO_USER):$(RO_PASSWD)@$(DB_SVC_NAME)-ro/$(DATABASE)"
+              value: "mysql://$(RO_USER):$(RO_PASSWD)@$(DB_SVC_NAME):6447/$(DATABASE)"
           command: ["/bin/sh"]
           args:
             - '-c'
