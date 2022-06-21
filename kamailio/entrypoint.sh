@@ -27,14 +27,16 @@ fi
 TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
 NS=$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace)
 CA_CRT="/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
-loadBalancerIP=$(curl -H "Authorization: Bearer $TOKEN" --cacert $CA_CRT https://kubernetes/api/v1/namespaces/$NS/services/kamailio | jq -r .status.loadBalancer.ingress[0].ip)
+LOADBALANCER_IP=$(curl -H "Authorization: Bearer $TOKEN" --cacert $CA_CRT https://kubernetes/api/v1/namespaces/$NS/services/kamailio | jq -r .status.loadBalancer.ingress[0].ip)
+LOADBALANCER_IP_REGEX_PATTERN=$(echo $LOADBALANCER_IP | sed 's/\./\\\./g')
 
 cat <<ENDHERE >/data/kamailio/local.k
-#!substdef "/k8s_loadbalencer_domain/${loadBalancerIP}/"
-#!define LB_IP "${loadBalancerIP}"
+#!substdef "/k8s_loadbalencer_domain/${LOADBALANCER_IP}/"
+#!define LB_IP "${LOADBALANCER_IP}"
 #!define LOCAL_IP "${PRIVATE_IPV4}"
-#!subst "/SUB_LB_IP/${loadBalancerIP}/g"
+#!subst "/SUB_LB_IP/${LOADBALANCER_IP}/g"
 #!subst "/SUB_LOCAL_IP/${PRIVATE_IPV4}/g"
+#!subst "/LOADBALANCER_IP_REGEX_PATTERN_IP/${LOADBALANCER_IP_REGEX_PATTERN}/g"
 alias=k8s_loadbalencer_domain
 listen=udp:${PRIVATE_IPV4}:5060 advertise k8s_loadbalencer_domain:5060
 listen=udp:${PRIVATE_IPV4}:5080

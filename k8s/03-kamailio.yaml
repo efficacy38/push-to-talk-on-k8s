@@ -85,7 +85,7 @@ metadata:
   labels:
     app: kamailio
 spec:
-  replicas: 1
+  replicas: 4
   selector:
     matchLabels:
       app: kamailio
@@ -152,7 +152,7 @@ spec:
       containers:
       - name: kamailio
         # image: efficacy38/kamailio:v1.13
-        image: efficacy38/kamailio:v1.15
+        image: efficacy38/kamailio:v1.16
         imagePullPolicy: Always
         # command: ["sleep", "infinity"]
         ports:
