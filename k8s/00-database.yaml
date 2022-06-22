@@ -6,8 +6,6 @@ spec:
   secretName: mypwds
   tlsUseSelfSigned: true
   instances: 3
-  # version: '5.7.38'
-  # version: '8.0.29'
+  mycnf: "max_connections = 500"
   router:
     instances: 1
-    # version: '8.0.29'
