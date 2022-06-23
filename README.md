@@ -1,4 +1,4 @@
-# HOW TO CONFIG IT
+# push to talk on k8s
 
 ## installation
 ### install CRD
@@ -7,7 +7,7 @@
     kubectl apply -f https://raw.githubusercontent.com/mysql/mysql-operator/trunk/deploy/deploy-crds.yaml
     kubectl apply -f https://raw.githubusercontent.com/mysql/mysql-operator/trunk/deploy/deploy-operator.yaml
     ```
-- add mysql db secret(you may change as u wish)
+- add mysql db secret(you may change the value as you wish)
     ```
     kubectl create secret generic mypwds \
         --from-literal=rootUser=root \
@@ -16,7 +16,7 @@
     ```
 
 ### import configuration
-- go to the directory
+- change to the directory
     - `cd k8s` 
 - import kamailio configMap
     `kubectl create configmap kamailio-config --from-file="./configs/kamailio.cfg"`
@@ -34,15 +34,15 @@
 ### create database table
 - create database
     - `k apply -f ./k8s/00-database.yaml`
-- edit the database account info
+- edit the database account info(associate with `mypwds` secret resource)
     - `vim k8s/configs/sql/.env`
-- port forward db to local env:
+- port forward db to local environment:
     - `kubectl port-forward service/mysqldb mysql`
 - create the tables
     - `cd k8s/configs/sql`
     - `./create_tbl.sh`
 
-### Deploy it following resource
+### Deploy following resource
 - `k apply -f ./k8s/01-service-watcher.yaml`
 - `k apply -f ./k8s/02-rtpengine.yaml`
 - `k apply -f ./k8s/03-kamailio.yaml`
@@ -57,10 +57,10 @@
         - `curl -o ~/.kamctlrc https://raw.githubusercontent.com/kamailio/kamailio/master/utils/kamctl/kamctlrc`
         - `vim ~/.kamctlrc`
             - uncomment and change `SIP_DOMAIN` to k8s kamailio loadbalancer service IP
-            - uncomment DBENGINE
-            - uncomment DBHOST and change it to `mysqldb`
-            - uncomment DBPORT, DBNAME
-            - uncomment DBRWUSER, DBRWPW to the desired value, or keep it as default
+            - uncomment `DBENGINE`
+            - uncomment `DBHOST` and change it to `mysqldb`(which is the service that defined at `00-database.yaml`)
+            - uncomment `DBPORT`, `DBNAME`
+            - uncomment `DBRWUSER`, `DBRWPW` to the your db credentials(which defined at secret `mypwds`), or keep it as default(unsecure)
         - add user
             - `kamctl add 1010 1234`
                 - 1020 is user
