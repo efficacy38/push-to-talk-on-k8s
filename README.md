@@ -34,9 +34,16 @@
 ### create database table
 - create database
     - `k apply -f ./00-database.yaml`
-- edit the database account info(associate with `mypwds` secret resource)
+    - this may take long time, using `k get pods | grep mysql` to list pods, it will show 2/2 and Running if it install sucessfully
+      ```
+      mysqldb-router-56c7d689c-kbqqz         1/1     Running   0             23h
+      mysqldb-0                              2/2     Running   0             23h
+      mysqldb-1                              2/2     Running   0             23h
+      mysqldb-2                              2/2     Running   0             23h
+      ```
+- (optional) edit the database account info(this is db root password, you can change it as you wish)
     - `vim ./configs/sql/.env`
-- port forward db to the local environment:
+- open a new terminal, this is a blocked program, which would port forward db to the local environment:
     - `kubectl port-forward service/mysqldb mysql`
 - create the tables
     - `cd ./configs/sql`
@@ -49,6 +56,7 @@
 
 ### Create SIP phone accounts and internal carrier links
 - create carrier link(for k8s interconnection)
+    - `apt install mysql-client`
     - `mysql -u root -psakila -h 127.0.0.1 kamailio`
     - `INSERT INTO address (ip_addr, mask, port, tag) VALUES('10.0.0.0', 8, 5060, 'inter-cluster connection');`
 - create user
