@@ -19,12 +19,12 @@
 - change to the directory
     - `cd k8s` 
 - import kamailio configMap
-    `kubectl create configmap kamailio-config --from-file="./configs/kamailio.cfg"`
-    `kubectl create configmap kamailio-db-config --from-env-file="./configs/kamailio_db_env.txt"`
+    - `kubectl create configmap kamailio-config --from-file="./configs/kamailio.cfg"`
+    - `kubectl create configmap kamailio-db-config --from-env-file="./configs/kamailio_db_env.txt"`
 - import kamailio secret
-    `kubectl create secret generic kamailio-db-secret --from-env-file="./configs/kamailio_db_secret_env.txt"`
+    - `kubectl create secret generic kamailio-db-secret --from-env-file="./configs/kamailio_db_secret_env.txt"`
 - crate watcher's configMap
-    `k create configmap --from-literal=db-host=mysqldb --from-literal=kamailio-rw-user=kamailio --from-literal=kamailio-rw-pw=kamailiorw --from-literal=kamailio-db=kamailio watcher-config`
+    - `k create configmap --from-literal=db-host=mysqldb --from-literal=kamailio-rw-user=kamailio --from-literal=kamailio-rw-pw=kamailiorw --from-literal=kamailio-db=kamailio watcher-config`
 
 <!-- ---
 - update kamailio configMap
