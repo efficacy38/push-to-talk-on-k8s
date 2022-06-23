@@ -33,19 +33,19 @@
 
 ### create database table
 - create database
-    - `k apply -f ./k8s/00-database.yaml`
+    - `k apply -f ./00-database.yaml`
 - edit the database account info(associate with `mypwds` secret resource)
-    - `vim k8s/configs/sql/.env`
+    - `vim ./configs/sql/.env`
 - port forward db to the local environment:
     - `kubectl port-forward service/mysqldb mysql`
 - create the tables
-    - `cd k8s/configs/sql`
+    - `cd ./configs/sql`
     - `./create_tbl.sh`
 
 ### Deploy the following resource
-- `k apply -f ./k8s/01-service-watcher.yaml`
-- `k apply -f ./k8s/02-rtpengine.yaml`
-- `k apply -f ./k8s/03-kamailio.yaml`
+- `k apply -f ./01-service-watcher.yaml`
+- `k apply -f ./02-rtpengine.yaml`
+- `k apply -f ./03-kamailio.yaml`
 
 ### Create SIP phone accounts and internal carrier links
 - create carrier link(for k8s interconnection)
