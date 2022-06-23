@@ -36,19 +36,19 @@
     - `k apply -f ./k8s/00-database.yaml`
 - edit the database account info(associate with `mypwds` secret resource)
     - `vim k8s/configs/sql/.env`
-- port forward db to local environment:
+- port forward db to the local environment:
     - `kubectl port-forward service/mysqldb mysql`
 - create the tables
     - `cd k8s/configs/sql`
     - `./create_tbl.sh`
 
-### Deploy following resource
+### Deploy the following resource
 - `k apply -f ./k8s/01-service-watcher.yaml`
 - `k apply -f ./k8s/02-rtpengine.yaml`
 - `k apply -f ./k8s/03-kamailio.yaml`
 
 ### Create SIP phone account and internal carrier link
-- crate carrier link(for k8s inter connection)
+- crate carrier link(for k8s interconnection)
     - `mysql -u root -psakila -h 127.0.0.1 kamailio`
     - `INSERT INTO address (ip_addr, mask, port, tag) VALUES('10.0.0.0', 8, 5060, 'inter-cluster connection');`
 - create user
@@ -56,11 +56,11 @@
         - `k exec -it kamailio-deployment-8ddb48ff-82rjf /bin/bash`
         - `curl -o ~/.kamctlrc https://raw.githubusercontent.com/kamailio/kamailio/master/utils/kamctl/kamctlrc`
         - `vim ~/.kamctlrc`
-            - uncomment and change `SIP_DOMAIN` to k8s kamailio loadbalancer service IP
+            - uncomment and change `SIP_DOMAIN` to k8s kamailio load balancer service IP
             - uncomment `DBENGINE`
-            - uncomment `DBHOST` and change it to `mysqldb`(which is the service that defined at `00-database.yaml`)
+            - uncomment `DBHOST` and change it to `mysqldb`(which is the service that is defined at `00-database.yaml`)
             - uncomment `DBPORT`, `DBNAME`
-            - uncomment `DBRWUSER`, `DBRWPW` to the your db credentials(which defined at secret `mypwds`), or keep it as default(unsecure)
+            - uncomment `DBRWUSER`, `DBRWPW` to your db credentials(which is defined at secret `mypwds`), or keep it as default(unsecure)
         - add user
             - `kamctl add 1010 1234`
                 - 1020 is user
