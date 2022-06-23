@@ -23,7 +23,7 @@
     - `kubectl create configmap kamailio-db-config --from-env-file="./configs/kamailio_db_env.txt"`
 - import kamailio secret
     - `kubectl create secret generic kamailio-db-secret --from-env-file="./configs/kamailio_db_secret_env.txt"`
-- crate watcher's configMap
+- create watcher's configMap
     - `k create configmap --from-literal=db-host=mysqldb --from-literal=kamailio-rw-user=kamailio --from-literal=kamailio-rw-pw=kamailiorw --from-literal=kamailio-db=kamailio watcher-config`
 
 <!-- ---
@@ -48,7 +48,7 @@
 - `k apply -f ./k8s/03-kamailio.yaml`
 
 ### Create SIP phone accounts and internal carrier links
-- crate carrier link(for k8s interconnection)
+- create carrier link(for k8s interconnection)
     - `mysql -u root -psakila -h 127.0.0.1 kamailio`
     - `INSERT INTO address (ip_addr, mask, port, tag) VALUES('10.0.0.0', 8, 5060, 'inter-cluster connection');`
 - create user
