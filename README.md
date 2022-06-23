@@ -47,7 +47,7 @@
 - `k apply -f ./k8s/02-rtpengine.yaml`
 - `k apply -f ./k8s/03-kamailio.yaml`
 
-### Create SIP phone account and internal carrier link
+### Create SIP phone accounts and internal carrier links
 - crate carrier link(for k8s interconnection)
     - `mysql -u root -psakila -h 127.0.0.1 kamailio`
     - `INSERT INTO address (ip_addr, mask, port, tag) VALUES('10.0.0.0', 8, 5060, 'inter-cluster connection');`
