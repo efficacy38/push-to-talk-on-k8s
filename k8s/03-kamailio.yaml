@@ -79,9 +79,9 @@ spec:
 
 ---
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
-  name: kamailio-deployment
+  name: kamailio-stateful
   labels:
     app: kamailio
 spec:
@@ -89,6 +89,8 @@ spec:
   selector:
     matchLabels:
       app: kamailio
+  serviceName: "kamailio"
+  podManagementPolicy: "Parallel"
   template:
     metadata:
       labels:
@@ -139,13 +141,17 @@ spec:
               value: "mysql://$(RW_USER):$(RW_PASSWD)@$(DB_SVC_NAME)/$(DATABASE)"
             - name: DBROURL
               value: "mysql://$(RO_USER):$(RO_PASSWD)@$(DB_SVC_NAME):6447/$(DATABASE)"
-          command: ["/bin/sh"]
+          command: ["/bin/bash"]
           args:
             - '-c'
-            - >-
-               printf '#!trydef DBURL "%s"\n' $DBURL >> /data/rtpengine/db_url.k;
-               printf '#!trydef RODBURL "%s"\n' $DBROURL >> /data/rtpengine/db_url.k;
-               printf '#!trydef CONTACT_DB "contacts_db=>%s"\n' $DBROURL >> /data/rtpengine/db_url;
+            - |
+              # get ordinal number from hostname
+              [[ `hostname` =~ -([0-9]+)$ ]] || exit 1;
+              ordinal=${BASH_REMATCH[1]};
+              printf 'server_id=%s\n' $ordinal >> /data/rtpengine/server_id.k;
+              printf '#!trydef DBURL "%s"\n' $DBURL >> /data/rtpengine/db_url.k;
+              printf '#!trydef RODBURL "%s"\n' $DBROURL >> /data/rtpengine/db_url.k;
+              printf '#!trydef CONTACT_DB "contacts_db=>%s"\n' $DBROURL >> /data/rtpengine/db_url;
           volumeMounts:
             - name: rtpengine-config
               mountPath: /data/rtpengine
