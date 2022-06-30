@@ -23,7 +23,7 @@
     - `kubectl create configmap kamailio-db-config --from-env-file="./configs/kamailio_db_env.txt"`
 - import kamailio secret
     - `kubectl create secret generic kamailio-db-secret --from-env-file="./configs/kamailio_db_secret_env.txt"`
-- crate watcher's configMap
+- create watcher's configMap
     - `k create configmap --from-literal=db-host=mysqldb --from-literal=kamailio-rw-user=kamailio --from-literal=kamailio-rw-pw=kamailiorw --from-literal=kamailio-db=kamailio watcher-config`
 
 <!-- ---
@@ -33,22 +33,30 @@
 
 ### create database table
 - create database
-    - `k apply -f ./k8s/00-database.yaml`
-- edit the database account info(associate with `mypwds` secret resource)
-    - `vim k8s/configs/sql/.env`
-- port forward db to the local environment:
+    - `k apply -f ./00-database.yaml`
+    - this may take long time, using `k get pods | grep mysql` to list pods, it will show 2/2 and Running if it install sucessfully
+      ```
+      mysqldb-router-56c7d689c-kbqqz         1/1     Running   0             23h
+      mysqldb-0                              2/2     Running   0             23h
+      mysqldb-1                              2/2     Running   0             23h
+      mysqldb-2                              2/2     Running   0             23h
+      ```
+- (optional) edit the database account info(this is db root password, you can change it as you wish)
+    - `vim ./configs/sql/.env`
+- open a new terminal, this is a blocked program, which would port forward db to the local environment:
     - `kubectl port-forward service/mysqldb mysql`
 - create the tables
-    - `cd k8s/configs/sql`
+    - `cd ./configs/sql`
     - `./create_tbl.sh`
 
 ### Deploy the following resource
-- `k apply -f ./k8s/01-service-watcher.yaml`
-- `k apply -f ./k8s/02-rtpengine.yaml`
-- `k apply -f ./k8s/03-kamailio.yaml`
+- `k apply -f ./01-service-watcher.yaml`
+- `k apply -f ./02-rtpengine.yaml`
+- `k apply -f ./03-kamailio.yaml`
 
 ### Create SIP phone accounts and internal carrier links
-- crate carrier link(for k8s interconnection)
+- create carrier link(for k8s interconnection)
+    - `apt install mysql-client`
     - `mysql -u root -psakila -h 127.0.0.1 kamailio`
     - `INSERT INTO address (ip_addr, mask, port, tag) VALUES('10.0.0.0', 8, 5060, 'inter-cluster connection');`
 - create user
