@@ -54,6 +54,18 @@
 - `k apply -f ./02-rtpengine.yaml`
 - `k apply -f ./03-kamailio.yaml`
 
+## application configuration
+### change rtpengine's port range
+- change the `rtpengine.conf`'s `port-min` and `port-max`
+- change `docker-compose.yml`'s `.service.rtpengine.ports` to disired mapping
+#### example
+- if i want to use port 20020 to port 20030
+    - at `rtpengine.conf`
+        - `port-min=20020`
+        - `port-max=20030`
+    - at `docker-compose.yml`'s `.service.rtpengine.ports`
+        - change it to `20020-20030:20020-20030/udp`
+
 ### Create SIP phone accounts and internal carrier links
 - create carrier link(for k8s interconnection)
     - `apt install mysql-client`
