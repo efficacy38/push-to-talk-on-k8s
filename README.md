@@ -66,7 +66,7 @@
     - at `docker-compose.yml`'s `.service.rtpengine.ports`
         - change it to `20020-20030:20020-20030/udp`
 
-### Create SIP phone accounts and internal carrier links
+### Create SIP phone accounts
 - create carrier link(for k8s interconnection)
     - `apt install mysql-client`
     - `mysql -u root -psakila -h 127.0.0.1 kamailio`
